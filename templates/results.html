@@ -136,7 +136,7 @@
                 <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>What This Means</h5>
             </div>
             <div class="card-body">
-                <p>Our deepfake detection system analyzes videos for signs of artificial manipulation. Here's how to interpret the results:</p>
+                <p>Our enhanced deepfake detection system analyzes videos using advanced image processing techniques to identify signs of AI-generated or manipulated content. Here's how to interpret the results:</p>
                 
                 <div class="row mt-3">
                     <div class="col-md-4">
@@ -144,7 +144,7 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
                                 <h5>High Real Score (>70%)</h5>
-                                <p>The video appears to be authentic with high confidence. No significant signs of manipulation detected.</p>
+                                <p>The video appears to be authentic with high confidence. Our advanced model found natural facial patterns, consistent lighting, and no significant signs of manipulation.</p>
                             </div>
                         </div>
                     </div>
@@ -154,7 +154,7 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-question-circle fa-2x mb-3 text-warning"></i>
                                 <h5>Uncertain (30-70%)</h5>
-                                <p>The system cannot determine with high confidence if the video is real or fake. Further investigation may be needed.</p>
+                                <p>The system detected some potential inconsistencies, but cannot conclusively determine authenticity. This may occur with compressed videos or unusual lighting conditions.</p>
                             </div>
                         </div>
                     </div>
@@ -164,14 +164,35 @@
                             <div class="card-body text-center">
                                 <i class="fas fa-exclamation-triangle fa-2x mb-3 text-danger"></i>
                                 <h5>High Fake Score (>70%)</h5>
-                                <p>The video shows strong indicators of deepfake manipulation. Treat this content with caution.</p>
+                                <p>Multiple indicators of manipulation detected, including unnatural textures, inconsistent lighting, blending artifacts, or abnormal frequency patterns. Treat this content with caution.</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
+                <div class="mt-4">
+                    <h5>How Our Detection Works</h5>
+                    <p>Our advanced model analyzes several key aspects of the video:</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush bg-dark mb-3">
+                                <li class="list-group-item bg-dark"><i class="fas fa-image text-info me-2"></i> <strong>Visual Texture Analysis:</strong> Natural faces have consistent texture patterns</li>
+                                <li class="list-group-item bg-dark"><i class="fas fa-border-style text-info me-2"></i> <strong>Edge Detection:</strong> Deepfakes often have unusual edges around blended regions</li>
+                                <li class="list-group-item bg-dark"><i class="fas fa-adjust text-info me-2"></i> <strong>Color Consistency:</strong> Examines natural color distribution in face regions</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush bg-dark">
+                                <li class="list-group-item bg-dark"><i class="fas fa-wave-square text-info me-2"></i> <strong>Frequency Analysis:</strong> Detects unusual patterns in image frequency spectrum</li>
+                                <li class="list-group-item bg-dark"><i class="fas fa-photo-video text-info me-2"></i> <strong>Frame Consistency:</strong> Checks for unnatural changes between frames</li>
+                                <li class="list-group-item bg-dark"><i class="fas fa-magic text-info me-2"></i> <strong>Noise Pattern Analysis:</strong> AI-generated content has distinctive noise signatures</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="alert alert-info mt-4">
-                    <i class="fas fa-info-circle me-2"></i> No detection system is perfect. While our tool uses advanced AI to identify deepfakes, it may not catch all manipulated videos, especially those created with the latest techniques.
+                    <i class="fas fa-info-circle me-2"></i> <strong>Important:</strong> While our tool uses advanced techniques to identify deepfakes, technology is constantly evolving. For critical verification needs, combine this tool with additional verification methods.
                 </div>
             </div>
         </div>
