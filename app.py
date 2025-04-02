@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG,
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "deepfake_detector_secret")
+app.secret_key = os.environ.get("SESSION_SECRET", "faster_than_lies_secret")
 
 # Increase request timeouts and buffer sizes
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB limit
