@@ -56,6 +56,64 @@
     margin-top: 15px;
 }
 
+/* Comparison container */
+.comparison-container {
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.comparison-container img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.comparison-container .card:hover img {
+    transform: scale(1.05);
+}
+
+.comparison-container .card-footer {
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+/* Video comparison styling */
+.video-comparison {
+    position: relative;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.video-comparison video {
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.comparison-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    z-index: 10;
+}
+
+.label-real {
+    background-color: rgba(25, 135, 84, 0.85);
+    color: white;
+}
+
+.label-fake {
+    background-color: rgba(220, 53, 69, 0.85);
+    color: white;
+}
+
 /* Pulse animation for processing indicator */
 @keyframes pulse {
     0% { transform: scale(1); }

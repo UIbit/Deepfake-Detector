@@ -88,6 +88,133 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-eye me-2"></i>Real vs Fake: Spot the Difference</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-4">Modern deepfakes can be incredibly convincing. Below are examples of real and AI-generated faces. Can you tell which is which?</p>
+                
+                <ul class="nav nav-tabs mb-3" id="comparisonTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab">Image Comparison</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos" type="button" role="tab">Video Comparison</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="comparisonTabContent">
+                    <div class="tab-pane fade show active" id="images" role="tabpanel" aria-labelledby="images-tab">
+                        <div class="row align-items-center mb-4">
+                            <div class="col-lg-6 mb-3 mb-lg-0">
+                                <div class="comparison-container">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="card bg-dark h-100">
+                                                <div class="card-header bg-success bg-opacity-25">
+                                                    <h6 class="mb-0 text-success">Real Video Frame</h6>
+                                                </div>
+                                                <div class="card-body p-2">
+                                                    <img src="https://i.imgur.com/p5qh3cA.jpg" class="img-fluid rounded" alt="Real face example">
+                                                </div>
+                                                <div class="card-footer bg-dark">
+                                                    <small>Notice natural skin texture and consistent lighting.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="card bg-dark h-100">
+                                                <div class="card-header bg-danger bg-opacity-25">
+                                                    <h6 class="mb-0 text-danger">Deepfake Video Frame</h6>
+                                                </div>
+                                                <div class="card-body p-2">
+                                                    <img src="https://i.imgur.com/qDLyzJX.jpg" class="img-fluid rounded" alt="Deepfake example">
+                                                </div>
+                                                <div class="card-footer bg-dark">
+                                                    <small>Look for subtle blending issues and unnatural textures.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <h5>Key Signs of Manipulation in Images</h5>
+                                <ul class="list-group list-group-flush bg-dark">
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Unnatural blending around facial edges</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Inconsistent lighting across the face</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Strange artifacts near eyes, teeth, or hair</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Unnatural skin texture or blurring</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Inconsistent shadow patterns</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="tab-pane fade" id="videos" role="tabpanel" aria-labelledby="videos-tab">
+                        <div class="row align-items-center mb-4">
+                            <div class="col-lg-6 mb-3 mb-lg-0">
+                                <h5 class="mb-3">Video Examples</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="video-comparison">
+                                            <span class="comparison-label label-real">Real Video</span>
+                                            <video controls class="mb-2">
+                                                <source src="/static/uploads/448ef9dc-d619-4923-8951-fa6e422e7ab9_01__talking_against_wall.mp4" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <p class="small text-muted">Notice the natural movements and consistent lighting throughout the video.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="video-comparison">
+                                            <span class="comparison-label label-fake">Deepfake Video</span>
+                                            <video controls class="mb-2">
+                                                <source src="/static/uploads/0c8ae2a1-1a03-494f-97c1-d76fe6f247fa_01_03__hugging_happy__ISF9SP4G.mp4" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <p class="small text-muted">Look for unnatural face movements and inconsistent texture details.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <h5>Key Signs of Manipulation in Videos</h5>
+                                <ul class="list-group list-group-flush bg-dark">
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Unnatural or jerky facial movements</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Mismatched audio and lip movements</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Flickering or inconsistent texture patterns</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Face boundary artifacts that appear/disappear</li>
+                                    <li class="list-group-item bg-dark"><i class="fas fa-check-circle text-danger me-2"></i>Inconsistent eye blinking or unnatural eye movement</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Important:</strong> While these examples show obvious differences, modern deepfakes are becoming increasingly difficult to detect with the human eye alone. That's why automated detection tools are essential.
+                </div>
+                
+                <div class="text-center mt-3">
+                    <a href="#upload-form" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>Try It Yourself
+                    </a>
+                    <a href="{{ url_for('about') }}" class="btn btn-outline-info ms-2">
+                        <i class="fas fa-book me-2"></i>Learn More About Deepfakes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">
