@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 from werkzeug.utils import secure_filename
 from detector import DeepfakeDetector
+from models import db, User, Analysis
+from sqlalchemy.exc import SQLAlchemyError
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +15,22 @@ logging.basicConfig(level=logging.DEBUG)
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "deepfake_detector_secret")
+
+# Database configuration
+# Format: postgresql://username:password@hostname:port/database_name
+db_host = os.environ.get('PGHOST', 'localhost')
+db_port = os.environ.get('PGPORT', '5432')
+db_name = os.environ.get('PGDATABASE', 'postgres')
+db_user = os.environ.get('PGUSER', 'postgres')
+db_password = os.environ.get('PGPASSWORD', '')
+
+database_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+logging.info(f"Database configured with host: {db_host}, port: {db_port}, database: {db_name}")
+
+# Initialize the database
+db.init_app(app)
 
 # Configuration
 UPLOAD_FOLDER = 'static/uploads'
@@ -28,6 +46,11 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 # Initialize the deepfake detector
 detector = DeepfakeDetector()
 
+# Create database tables
+with app.app_context():
+    db.create_all()
+    logging.info("Database tables created")
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -38,6 +61,17 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/history')
+def history():
+    # Fetch the 10 most recent analyses
+    try:
+        recent_analyses = Analysis.query.order_by(Analysis.created_at.desc()).limit(10).all()
+        return render_template('history.html', analyses=recent_analyses)
+    except Exception as e:
+        logging.error(f"Error retrieving analysis history: {str(e)}")
+        flash(f'Error retrieving analysis history: {str(e)}', 'danger')
+        return redirect(url_for('index'))
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -60,14 +94,45 @@ def upload_file():
     
     try:
         # Generate a unique filename to prevent overwriting
-        filename = str(uuid.uuid4()) + '_' + secure_filename(file.filename)
+        original_filename = secure_filename(file.filename)
+        filename = str(uuid.uuid4()) + '_' + original_filename
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
+        
+        # Get file size
+        file_size = os.path.getsize(filepath)
         
         # Process the video
         result = detector.analyze_video(filepath)
         
-        # Store results in session - convert boolean to string to avoid JSON serialization issues
+        # Store in database
+        analysis = Analysis(
+            filename=filename,
+            original_filename=original_filename,
+            file_path=filepath,
+            file_size=file_size,
+            real_probability=float(result['real_probability']),
+            fake_probability=float(result['fake_probability']),
+            is_fake=bool(result['is_fake']),
+            confidence=float(result['confidence']),
+            processing_time=float(result['processing_time']),
+            analyzed_frames=int(result['analyzed_frames'])
+        )
+        
+        try:
+            db.session.add(analysis)
+            db.session.commit()
+            logging.info(f"Analysis saved to database with ID: {analysis.id}")
+            
+            # Set the analysis ID in session for later retrieval
+            session['analysis_id'] = analysis.id
+            
+        except SQLAlchemyError as db_error:
+            db.session.rollback()
+            logging.error(f"Database error: {str(db_error)}")
+            # Fall back to session storage if database fails
+            
+        # Store results in session as well for backward compatibility - convert boolean to string to avoid JSON serialization issues
         session['results'] = {
             'filename': filename,
             'filepath': filepath,
@@ -88,11 +153,67 @@ def upload_file():
 
 @app.route('/results')
 def results():
-    if 'results' not in session:
-        flash('No results to display. Please upload a video first.', 'warning')
-        return redirect(url_for('index'))
+    # Check if an analysis ID was passed as a parameter (from history page)
+    analysis_id = request.args.get('analysis_id')
     
-    return render_template('results.html', results=session['results'])
+    if analysis_id:
+        try:
+            # Get the analysis from database with the provided ID
+            analysis = Analysis.query.get(analysis_id)
+            if analysis:
+                # Convert to a dictionary format for the template
+                results_dict = {
+                    'filename': analysis.filename,
+                    'filepath': analysis.file_path,
+                    'real_probability': float(analysis.real_probability),
+                    'fake_probability': float(analysis.fake_probability),
+                    'is_fake': 'true' if analysis.is_fake else 'false',
+                    'confidence': float(analysis.confidence),
+                    'processing_time': float(analysis.processing_time),
+                    'analyzed_frames': int(analysis.analyzed_frames),
+                    'original_filename': analysis.original_filename,
+                    'file_size': analysis.file_size,
+                    'created_at': analysis.created_at
+                }
+                return render_template('results.html', results=results_dict, from_db=True)
+        except Exception as e:
+            logging.error(f"Error retrieving analysis from database: {str(e)}")
+            flash(f'Error retrieving analysis: {str(e)}', 'danger')
+            return redirect(url_for('history'))
+    
+    # Check if we have an analysis ID in the session (from upload)
+    elif 'analysis_id' in session:
+        # Fetch from database using ID
+        session_analysis_id = session['analysis_id']
+        try:
+            analysis = Analysis.query.get(session_analysis_id)
+            if analysis:
+                # Convert to a dictionary format for the template
+                results_dict = {
+                    'filename': analysis.filename,
+                    'filepath': analysis.file_path,
+                    'real_probability': float(analysis.real_probability),
+                    'fake_probability': float(analysis.fake_probability),
+                    'is_fake': 'true' if analysis.is_fake else 'false',
+                    'confidence': float(analysis.confidence),
+                    'processing_time': float(analysis.processing_time),
+                    'analyzed_frames': int(analysis.analyzed_frames),
+                    'original_filename': analysis.original_filename,
+                    'file_size': analysis.file_size,
+                    'created_at': analysis.created_at
+                }
+                return render_template('results.html', results=results_dict, from_db=True)
+        except Exception as e:
+            logging.error(f"Error retrieving analysis from database: {str(e)}")
+            # Fall back to session data if database retrieval fails
+            
+    # Fall back to session data
+    if 'results' in session:
+        return render_template('results.html', results=session['results'], from_db=False)
+    
+    # No results available
+    flash('No results to display. Please upload a video first.', 'warning')
+    return redirect(url_for('index'))
 
 @app.errorhandler(413)
 def request_entity_too_large(error):

@@ -47,6 +47,24 @@
                                     <span>{{ (results.confidence * 100)|round }}%</span>
                                 </div>
                             </li>
+                            {% if from_db is defined and from_db %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Original Filename
+                                <span class="badge bg-secondary">{{ results.original_filename }}</span>
+                            </li>
+                            {% if results.file_size %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                File Size
+                                <span class="badge bg-secondary">{{ (results.file_size / 1024 / 1024)|round(2) }} MB</span>
+                            </li>
+                            {% endif %}
+                            {% if results.created_at %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Analysis Date
+                                <span class="badge bg-secondary">{{ results.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                            </li>
+                            {% endif %}
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
