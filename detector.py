@@ -116,69 +116,110 @@ class DeepfakeDetector:
         Returns a dictionary with the analysis results.
         """
         start_time = time.time()
+        video = None
         
-        # Open the video file
-        video = cv2.VideoCapture(video_path)
-        if not video.isOpened():
-            raise ValueError(f"Could not open video file: {video_path}")
-        
-        total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-        fps = video.get(cv2.CAP_PROP_FPS)
-        
-        # Calculate frame sampling rate - analyze approximately one frame per second
-        sampling_rate = max(1, int(fps))
-        
-        frame_count = 0
-        analyzed_count = 0
-        predictions = []
-        
-        # Process video frames
-        while True:
-            ret, frame = video.read()
-            if not ret:
-                break
-            
-            # Sample frames at the specified rate
-            if frame_count % sampling_rate == 0:
-                prediction = self.predict_frame(frame)
-                predictions.append(prediction)
-                analyzed_count += 1
+        try:
+            # Verify the file exists
+            if not os.path.exists(video_path):
+                raise FileNotFoundError(f"Video file not found: {video_path}")
                 
-                # Limit the number of analyzed frames for demo purposes
-                if analyzed_count >= 10:
+            # Check file size
+            file_size = os.path.getsize(video_path)
+            if file_size == 0:
+                raise ValueError(f"Video file is empty: {video_path}")
+            
+            logging.info(f"Starting analysis of video: {video_path}, size: {file_size} bytes")
+            
+            # Open the video file
+            video = cv2.VideoCapture(video_path)
+            if not video.isOpened():
+                raise ValueError(f"Could not open video file: {video_path}")
+            
+            total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+            fps = video.get(cv2.CAP_PROP_FPS)
+            
+            logging.info(f"Video properties: {total_frames} frames, {fps} FPS")
+            
+            # Validate video properties
+            if total_frames <= 0 or fps <= 0:
+                logging.warning(f"Suspicious video properties: frames={total_frames}, fps={fps}")
+                # Continue anyway, but with default values
+                if total_frames <= 0:
+                    total_frames = 30  # Assume at least one second
+                if fps <= 0:
+                    fps = 30  # Assume standard framerate
+            
+            # Calculate frame sampling rate - analyze approximately one frame per second
+            sampling_rate = max(1, int(fps))
+            
+            frame_count = 0
+            analyzed_count = 0
+            predictions = []
+            
+            # Process video frames
+            while True:
+                ret, frame = video.read()
+                if not ret:
+                    break
+                
+                # Sample frames at the specified rate
+                if frame_count % sampling_rate == 0:
+                    try:
+                        prediction = self.predict_frame(frame)
+                        predictions.append(prediction)
+                        analyzed_count += 1
+                        
+                        # Log progress
+                        if analyzed_count % 5 == 0:
+                            logging.debug(f"Analyzed {analyzed_count} frames so far")
+                        
+                        # Limit the number of analyzed frames for demo purposes
+                        if analyzed_count >= 10:
+                            break
+                    except Exception as frame_error:
+                        logging.warning(f"Error analyzing frame {frame_count}: {str(frame_error)}")
+                        # Continue to next frame
+                
+                frame_count += 1
+                
+                # For demo purposes, limit total frames processed
+                if frame_count >= 100:
                     break
             
-            frame_count += 1
+            # Calculate average prediction
+            avg_prediction = np.mean(predictions) if predictions else 0.5
             
-            # For demo purposes, limit total frames processed
-            if frame_count >= 100:
-                break
-        
-        # Release the video file
-        video.release()
-        
-        # Calculate average prediction
-        avg_prediction = np.mean(predictions) if predictions else 0.5
-        
-        # Determine if the video is fake based on the prediction
-        # Threshold can be adjusted based on model performance
-        is_fake = avg_prediction > 0.5
-        
-        # Calculate probabilities
-        fake_probability = float(avg_prediction)
-        real_probability = float(1.0 - avg_prediction)
-        
-        # Calculate confidence - how far from 0.5 (uncertain) the prediction is
-        confidence = abs(avg_prediction - 0.5) * 2  # Scale to 0-1
-        
-        # Format the output
-        processing_time = time.time() - start_time
-        
-        return {
-            'real_probability': real_probability,
-            'fake_probability': fake_probability,
-            'is_fake': is_fake,
-            'confidence': confidence,
-            'processing_time': processing_time,
-            'analyzed_frames': analyzed_count
-        }
+            # Determine if the video is fake based on the prediction
+            # Threshold can be adjusted based on model performance
+            is_fake = avg_prediction > 0.5
+            
+            # Calculate probabilities
+            fake_probability = float(avg_prediction)
+            real_probability = float(1.0 - avg_prediction)
+            
+            # Calculate confidence - how far from 0.5 (uncertain) the prediction is
+            confidence = abs(avg_prediction - 0.5) * 2  # Scale to 0-1
+            
+            # Format the output
+            processing_time = time.time() - start_time
+            
+            result = {
+                'real_probability': real_probability,
+                'fake_probability': fake_probability,
+                'is_fake': is_fake,
+                'confidence': confidence,
+                'processing_time': processing_time,
+                'analyzed_frames': analyzed_count
+            }
+            
+            logging.info(f"Analysis complete: is_fake={is_fake}, confidence={confidence:.2f}, time={processing_time:.2f}s")
+            return result
+            
+        except Exception as e:
+            logging.error(f"Error during video analysis: {str(e)}", exc_info=True)
+            raise
+            
+        finally:
+            # Ensure video is released even if an exception occurs
+            if video is not None:
+                video.release()
