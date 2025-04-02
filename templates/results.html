@@ -1,0 +1,172 @@
+{% extends "layout.html" %}
+
+{% block title %} - Analysis Results{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-dark">
+        <h4 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Analysis Results</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Video preview -->
+                <div class="mb-4 rounded overflow-hidden">
+                    <video controls class="w-100 rounded">
+                        <source src="{{ url_for('static', filename='uploads/' + results.filename) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <!-- Analysis stats -->
+                <div class="card bg-dark mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Analysis Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush bg-dark">
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Frames Analyzed
+                                <span class="badge bg-info rounded-pill">{{ results.analyzed_frames }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Processing Time
+                                <span class="badge bg-info rounded-pill">{{ results.processing_time|round(2) }} seconds</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Confidence Level
+                                <div class="d-flex align-items-center">
+                                    <div class="progress me-2" style="width: 100px;">
+                                        <div class="progress-bar {% if results.confidence > 0.7 %}bg-success{% elif results.confidence > 0.4 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ (results.confidence * 100)|round }}%"
+                                             aria-valuenow="{{ (results.confidence * 100)|round }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                    <span>{{ (results.confidence * 100)|round }}%</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <!-- Result overview -->
+                <div class="text-center mb-4">
+                    {% if results.is_fake %}
+                        {% if results.confidence > 0.7 %}
+                            <div class="result-fake p-3 bg-danger bg-opacity-10 rounded">
+                                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                                <h3>Likely Fake</h3>
+                                <p class="lead">This video shows strong signs of deepfake manipulation.</p>
+                            </div>
+                        {% else %}
+                            <div class="result-uncertain p-3 bg-warning bg-opacity-10 rounded">
+                                <i class="fas fa-question-circle fa-3x mb-3"></i>
+                                <h3>Possibly Fake</h3>
+                                <p class="lead">This video shows some indicators of manipulation, but with lower confidence.</p>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if results.confidence > 0.7 %}
+                            <div class="result-real p-3 bg-success bg-opacity-10 rounded">
+                                <i class="fas fa-check-circle fa-3x mb-3"></i>
+                                <h3>Likely Authentic</h3>
+                                <p class="lead">No significant signs of deepfake manipulation detected.</p>
+                            </div>
+                        {% else %}
+                            <div class="result-uncertain p-3 bg-warning bg-opacity-10 rounded">
+                                <i class="fas fa-question-circle fa-3x mb-3"></i>
+                                <h3>Possibly Authentic</h3>
+                                <p class="lead">Appears authentic but with lower confidence.</p>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <!-- Probability chart -->
+                <div class="card bg-dark mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Authenticity Score</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="position: relative; height:260px;">
+                            <canvas id="result-chart" 
+                                    data-real="{{ results.real_probability }}" 
+                                    data-fake="{{ results.fake_probability }}"></canvas>
+                        </div>
+                        <div class="row mt-3 text-center">
+                            <div class="col-6">
+                                <h5 class="text-info">Real</h5>
+                                <h3>{{ (results.real_probability * 100)|round(1) }}%</h3>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="text-danger">Fake</h5>
+                                <h3>{{ (results.fake_probability * 100)|round(1) }}%</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- What this means section -->
+        <div class="card bg-dark mt-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>What This Means</h5>
+            </div>
+            <div class="card-body">
+                <p>Our deepfake detection system analyzes videos for signs of artificial manipulation. Here's how to interpret the results:</p>
+                
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card h-100 bg-success bg-opacity-10">
+                            <div class="card-body text-center">
+                                <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+                                <h5>High Real Score (>70%)</h5>
+                                <p>The video appears to be authentic with high confidence. No significant signs of manipulation detected.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100 bg-warning bg-opacity-10">
+                            <div class="card-body text-center">
+                                <i class="fas fa-question-circle fa-2x mb-3 text-warning"></i>
+                                <h5>Uncertain (30-70%)</h5>
+                                <p>The system cannot determine with high confidence if the video is real or fake. Further investigation may be needed.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100 bg-danger bg-opacity-10">
+                            <div class="card-body text-center">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-3 text-danger"></i>
+                                <h5>High Fake Score (>70%)</h5>
+                                <p>The video shows strong indicators of deepfake manipulation. Treat this content with caution.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle me-2"></i> No detection system is perfect. While our tool uses advanced AI to identify deepfakes, it may not catch all manipulated videos, especially those created with the latest techniques.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Analyze Another Video
+            </a>
+            <a href="{{ url_for('about') }}" class="btn btn-outline-info">
+                <i class="fas fa-book me-2"></i>Learn More About Deepfakes
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

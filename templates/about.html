@@ -1,0 +1,238 @@
+{% extends "layout.html" %}
+
+{% block title %} - About Deepfakes{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h4 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>Understanding Deepfakes</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="mb-3">What are Deepfakes?</h5>
+                <p>
+                    Deepfakes are synthetic media created using artificial intelligence, specifically deep learning techniques. 
+                    The term "deepfake" combines "deep learning" and "fake," highlighting how these advanced AI systems can 
+                    create highly realistic but fabricated content that can be nearly indistinguishable from authentic media.
+                </p>
+                <p>
+                    Most commonly, deepfakes involve superimposing existing images or videos onto source images or videos 
+                    using a machine learning technique called a generative adversarial network (GAN). This allows for 
+                    the creation of convincing but false depictions of people saying or doing things they never did.
+                </p>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="mb-3">How Deepfakes Are Created</h5>
+                <div class="card bg-dark mb-3">
+                    <div class="card-body">
+                        <h6><i class="fas fa-cog me-2 text-primary"></i>Data Collection</h6>
+                        <p>Creators gather hundreds or thousands of images of the target individual from different angles and in various lighting conditions.</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-dark mb-3">
+                    <div class="card-body">
+                        <h6><i class="fas fa-brain me-2 text-info"></i>Training the AI</h6>
+                        <p>The AI system (typically GANs) is trained on this dataset to learn the facial features, expressions, and mannerisms of the person.</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-dark mb-3">
+                    <div class="card-body">
+                        <h6><i class="fas fa-sync-alt me-2 text-warning"></i>Face Swapping</h6>
+                        <p>The trained model is used to superimpose the learned face onto another person in a target video, matching expressions and movements.</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-dark">
+                    <div class="card-body">
+                        <h6><i class="fas fa-magic me-2 text-success"></i>Post-Processing</h6>
+                        <p>Additional adjustments are made to improve realism, such as color correction, smoothing boundaries, and adding realistic lighting effects.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="mb-3">Common Indicators of Deepfakes</h5>
+                <div class="card bg-dark mb-3">
+                    <div class="card-body">
+                        <h6><i class="fas fa-eye me-2 text-danger"></i>Unnatural Eye Movement</h6>
+                        <p>Eyes may not blink naturally or may have inconsistent movements compared to natural human behavior.</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-dark mb-3">
+                    <div class="card-body">
+                        <h6><i class="fas fa-border-style me-2 text-warning"></i>Facial Boundary Issues</h6>
+                        <p>Blurring, ghosting, or unnatural transitions between the face and the rest of the head, especially around hairlines.</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-dark mb-3">
+                    <div class="card-body">
+                        <h6><i class="fas fa-lightbulb me-2 text-info"></i>Lighting Inconsistencies</h6>
+                        <p>Different lighting patterns on the face compared to the surrounding environment or unnatural shadows.</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-dark">
+                    <div class="card-body">
+                        <h6><i class="fas fa-wave-square me-2 text-primary"></i>Audio-Visual Mismatches</h6>
+                        <p>Lip movements that don't perfectly sync with speech or unnatural voice qualities if audio has been synthesized.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="mb-3">Potential Risks and Impacts</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 bg-danger bg-opacity-10">
+                            <div class="card-body">
+                                <h6 class="text-danger"><i class="fas fa-user-secret me-2"></i>Personal Reputation Damage</h6>
+                                <p>Deepfakes can place individuals in compromising or embarrassing situations, causing significant personal and professional harm.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 bg-warning bg-opacity-10">
+                            <div class="card-body">
+                                <h6 class="text-warning"><i class="fas fa-globe me-2"></i>Political Manipulation</h6>
+                                <p>Creating false statements from political figures can influence public opinion, election results, and international relations.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 bg-info bg-opacity-10">
+                            <div class="card-body">
+                                <h6 class="text-info"><i class="fas fa-newspaper me-2"></i>Erosion of Trust in Media</h6>
+                                <p>As deepfakes become more prevalent, they can undermine trust in all media, making it difficult to distinguish fact from fiction.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="mb-3">How Our Detector Works</h5>
+                <p>
+                    Our deepfake detection system analyzes videos using advanced computer vision and machine learning techniques. 
+                    Here's how the process works:
+                </p>
+                
+                <div class="row mt-3">
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 bg-dark">
+                            <div class="card-body text-center">
+                                <i class="fas fa-film fa-2x mb-3 text-primary"></i>
+                                <h6>Frame Extraction</h6>
+                                <p class="small">We extract individual frames from the uploaded video for analysis.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 bg-dark">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user fa-2x mb-3 text-info"></i>
+                                <h6>Face Detection</h6>
+                                <p class="small">Faces are detected and isolated in each frame for detailed examination.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 bg-dark">
+                            <div class="card-body text-center">
+                                <i class="fas fa-microscope fa-2x mb-3 text-warning"></i>
+                                <h6>Feature Analysis</h6>
+                                <p class="small">Our AI examines facial features for inconsistencies and manipulation artifacts.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100 bg-dark">
+                            <div class="card-body text-center">
+                                <i class="fas fa-percentage fa-2x mb-3 text-success"></i>
+                                <h6>Probability Scoring</h6>
+                                <p class="small">A final authenticity score is calculated based on detected anomalies.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-secondary mt-3">
+                    <i class="fas fa-code me-2"></i> Our system uses a model trained on the <a href="https://github.com/ondyari/FaceForensics" target="_blank" class="alert-link">FaceForensics++</a> dataset, one of the leading benchmarks for deepfake detection research.
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="mb-3">Protecting Yourself from Deepfakes</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-dark">
+                            <div class="card-body">
+                                <h6><i class="fas fa-search me-2 text-primary"></i>Verify Sources</h6>
+                                <p>Before believing or sharing sensational content, verify it comes from reputable sources. Check if other trusted news outlets are reporting the same information.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-dark">
+                            <div class="card-body">
+                                <h6><i class="fas fa-shield-alt me-2 text-success"></i>Use Detection Tools</h6>
+                                <p>Utilize deepfake detection tools like ours when you encounter suspicious videos, especially those making extraordinary claims about public figures.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-dark">
+                            <div class="card-body">
+                                <h6><i class="fas fa-question-circle me-2 text-warning"></i>Look for Inconsistencies</h6>
+                                <p>Pay attention to unnatural facial movements, lighting issues, or audio that doesn't quite match lip movements.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-dark">
+                            <div class="card-body">
+                                <h6><i class="fas fa-user-lock me-2 text-danger"></i>Protect Your Online Images</h6>
+                                <p>Limit public access to your photos and videos online, as large collections of your images could be used to create deepfakes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-center">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Detector
+        </a>
+    </div>
+</div>
+{% endblock %}

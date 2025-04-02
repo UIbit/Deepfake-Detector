@@ -1,0 +1,75 @@
+/* 
+  Minimal custom CSS - we're prioritizing Bootstrap's built-in classes
+  per the styling guideline. Only adding styles that are not available in Bootstrap.
+*/
+
+/* Gradient background for the jumbotron */
+.gradient-custom {
+    background: linear-gradient(to right, var(--bs-primary-bg-subtle), var(--bs-info-bg-subtle));
+}
+
+/* Upload zone styling */
+.upload-zone {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 5px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+    border-color: var(--bs-primary);
+    background-color: var(--bs-dark-bg-subtle);
+}
+
+/* Result indicator styles */
+.result-real {
+    color: var(--bs-success);
+    border-left: 4px solid var(--bs-success);
+    padding-left: 15px;
+}
+
+.result-fake {
+    color: var(--bs-danger);
+    border-left: 4px solid var(--bs-danger);
+    padding-left: 15px;
+}
+
+.result-uncertain {
+    color: var(--bs-warning);
+    border-left: 4px solid var(--bs-warning);
+    padding-left: 15px;
+}
+
+/* Confidence meter */
+.confidence-meter {
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Video preview container */
+.video-preview-container {
+    max-height: 300px;
+    overflow: hidden;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+/* Pulse animation for processing indicator */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+/* Footer styling */
+.footer {
+    margin-top: 50px;
+    padding: 20px 0;
+    background-color: var(--bs-tertiary-bg);
+}
