@@ -67,16 +67,16 @@ def upload_file():
         # Process the video
         result = detector.analyze_video(filepath)
         
-        # Store results in session
+        # Store results in session - convert boolean to string to avoid JSON serialization issues
         session['results'] = {
             'filename': filename,
             'filepath': filepath,
-            'real_probability': result['real_probability'],
-            'fake_probability': result['fake_probability'],
-            'is_fake': result['is_fake'],
-            'confidence': result['confidence'],
-            'processing_time': result['processing_time'],
-            'analyzed_frames': result['analyzed_frames']
+            'real_probability': float(result['real_probability']),
+            'fake_probability': float(result['fake_probability']),
+            'is_fake': 'true' if result['is_fake'] else 'false',
+            'confidence': float(result['confidence']),
+            'processing_time': float(result['processing_time']),
+            'analyzed_frames': int(result['analyzed_frames'])
         }
         
         return redirect(url_for('results'))
