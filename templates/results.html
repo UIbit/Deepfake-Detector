@@ -29,6 +29,24 @@
                                 Frames Analyzed
                                 <span class="badge bg-info rounded-pill">{{ results.analyzed_frames }}</span>
                             </li>
+                            {% if results.total_frames is defined %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Total Video Frames
+                                <span class="badge bg-secondary rounded-pill">{{ results.total_frames }}</span>
+                            </li>
+                            {% endif %}
+                            {% if results.fps is defined %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Frame Rate
+                                <span class="badge bg-secondary rounded-pill">{{ results.fps|round(1) }} FPS</span>
+                            </li>
+                            {% endif %}
+                            {% if results.resolution is defined %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Resolution
+                                <span class="badge bg-secondary rounded-pill">{{ results.resolution }}</span>
+                            </li>
+                            {% endif %}
                             <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
                                 Processing Time
                                 <span class="badge bg-info rounded-pill">{{ results.processing_time|round(2) }} seconds</span>
@@ -47,6 +65,31 @@
                                     <span>{{ (results.confidence * 100)|round }}%</span>
                                 </div>
                             </li>
+                            {% if results.prediction_std is defined %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Frame Consistency
+                                <div class="d-flex align-items-center">
+                                    <div class="progress me-2" style="width: 100px;">
+                                        {% set consistency = (1.0 - results.prediction_std*2) %}
+                                        {% set consistency = [consistency, 0]|max %}
+                                        {% set consistency = [consistency, 1]|min %}
+                                        <div class="progress-bar {% if consistency > 0.7 %}bg-success{% elif consistency > 0.4 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ (consistency * 100)|round }}%"
+                                             aria-valuenow="{{ (consistency * 100)|round }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                    <span>{{ (consistency * 100)|round }}%</span>
+                                </div>
+                            </li>
+                            {% endif %}
+                            {% if results.scene_changes is defined %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
+                                Scene Changes
+                                <span class="badge bg-secondary rounded-pill">{{ results.scene_changes }}</span>
+                            </li>
+                            {% endif %}
                             {% if from_db is defined and from_db %}
                             <li class="list-group-item d-flex justify-content-between align-items-center bg-dark">
                                 Original Filename
@@ -64,6 +107,11 @@
                                 <span class="badge bg-secondary">{{ results.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
                             </li>
                             {% endif %}
+                            {% endif %}
+                            {% if results.error is defined and results.error %}
+                            <li class="list-group-item bg-dark text-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i><strong>Error:</strong> {{ results.error }}
+                            </li>
                             {% endif %}
                         </ul>
                     </div>
@@ -171,22 +219,62 @@
                 </div>
                 
                 <div class="mt-4">
-                    <h5>How Our Detection Works</h5>
-                    <p>Our advanced model analyzes several key aspects of the video:</p>
+                    <h5>How Our Enhanced Detection Works</h5>
+                    <p>Our advanced model uses multi-modal analysis with specialized techniques for deepfake detection:</p>
                     <div class="row">
                         <div class="col-md-6">
-                            <ul class="list-group list-group-flush bg-dark mb-3">
-                                <li class="list-group-item bg-dark"><i class="fas fa-image text-info me-2"></i> <strong>Visual Texture Analysis:</strong> Natural faces have consistent texture patterns</li>
-                                <li class="list-group-item bg-dark"><i class="fas fa-border-style text-info me-2"></i> <strong>Edge Detection:</strong> Deepfakes often have unusual edges around blended regions</li>
-                                <li class="list-group-item bg-dark"><i class="fas fa-adjust text-info me-2"></i> <strong>Color Consistency:</strong> Examines natural color distribution in face regions</li>
-                            </ul>
+                            <div class="card bg-dark mb-3 h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-image text-info me-2"></i>Image-Based Analysis</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush bg-dark mb-0">
+                                        <li class="list-group-item bg-dark"><i class="fas fa-fingerprint text-info me-2"></i> <strong>Multi-scale LBP Texture:</strong> Analyzes facial texture at multiple scales</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-border-style text-info me-2"></i> <strong>Boundary Detection:</strong> Uses multiple edge detectors to find blending artifacts</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-adjust text-info me-2"></i> <strong>Color Space Analysis:</strong> Examines HSV and LAB color distributions</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-bezier-curve text-info me-2"></i> <strong>Eye-Mouth Consistency:</strong> Checks consistency between facial regions</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <ul class="list-group list-group-flush bg-dark">
-                                <li class="list-group-item bg-dark"><i class="fas fa-wave-square text-info me-2"></i> <strong>Frequency Analysis:</strong> Detects unusual patterns in image frequency spectrum</li>
-                                <li class="list-group-item bg-dark"><i class="fas fa-photo-video text-info me-2"></i> <strong>Frame Consistency:</strong> Checks for unnatural changes between frames</li>
-                                <li class="list-group-item bg-dark"><i class="fas fa-magic text-info me-2"></i> <strong>Noise Pattern Analysis:</strong> AI-generated content has distinctive noise signatures</li>
-                            </ul>
+                            <div class="card bg-dark mb-3 h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-film text-info me-2"></i>Video-Based Analysis</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush bg-dark mb-0">
+                                        <li class="list-group-item bg-dark"><i class="fas fa-wave-square text-info me-2"></i> <strong>Multi-band Frequency:</strong> Analyzes low, mid, and high frequency components</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-chart-line text-info me-2"></i> <strong>Temporal Consistency:</strong> Tracks faces across frames for unnatural movements</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-photo-video text-info me-2"></i> <strong>Scene Change Detection:</strong> Identifies suspicious editing patterns</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-filter text-info me-2"></i> <strong>Noise Signature Analysis:</strong> Detects unnatural noise patterns with multiple filters</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-dark mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-brain text-info me-2"></i>Advanced Processing Techniques</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-group list-group-flush bg-dark">
+                                        <li class="list-group-item bg-dark"><i class="fas fa-filter text-info me-2"></i> <strong>DCT Analysis:</strong> Detects compression artifacts common in manipulated content</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-chart-bar text-info me-2"></i> <strong>Statistical Outlier Rejection:</strong> Improves accuracy by filtering extreme predictions</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-balance-scale text-info me-2"></i> <strong>Adaptive Thresholding:</strong> Adjusts decision threshold based on video quality</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-group list-group-flush bg-dark">
+                                        <li class="list-group-item bg-dark"><i class="fas fa-eye text-info me-2"></i> <strong>Enhanced Face Detection:</strong> Improves face extraction with eye verification</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-code-branch text-info me-2"></i> <strong>Multi-feature Fusion:</strong> Combines 8+ detection methods for better results</li>
+                                        <li class="list-group-item bg-dark"><i class="fas fa-history text-info me-2"></i> <strong>Frame Quality Assessment:</strong> Ensures analysis focuses on best quality frames</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

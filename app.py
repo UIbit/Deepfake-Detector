@@ -65,6 +65,39 @@ with app.app_context():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def analysis_to_dict(analysis):
+    """Convert an Analysis object to a dictionary with all available metrics"""
+    results_dict = {
+        'filename': analysis.filename,
+        'filepath': analysis.file_path,
+        'real_probability': float(analysis.real_probability),
+        'fake_probability': float(analysis.fake_probability),
+        'is_fake': 'true' if analysis.is_fake else 'false',
+        'confidence': float(analysis.confidence),
+        'processing_time': float(analysis.processing_time),
+        'analyzed_frames': int(analysis.analyzed_frames),
+        'original_filename': analysis.original_filename,
+        'file_size': analysis.file_size,
+        'created_at': analysis.created_at
+    }
+    
+    # Add enhanced metrics if available
+    if hasattr(analysis, 'total_frames') and analysis.total_frames is not None:
+        results_dict['total_frames'] = analysis.total_frames
+    if hasattr(analysis, 'fps') and analysis.fps is not None:
+        results_dict['fps'] = analysis.fps
+    if hasattr(analysis, 'resolution_width') and hasattr(analysis, 'resolution_height'):
+        if analysis.resolution_width is not None and analysis.resolution_height is not None:
+            results_dict['resolution'] = f"{analysis.resolution_width}x{analysis.resolution_height}"
+    if hasattr(analysis, 'prediction_std') and analysis.prediction_std is not None:
+        results_dict['prediction_std'] = analysis.prediction_std
+    if hasattr(analysis, 'scene_changes') and analysis.scene_changes is not None:
+        results_dict['scene_changes'] = analysis.scene_changes
+    if hasattr(analysis, 'error_message') and analysis.error_message:
+        results_dict['error'] = analysis.error_message
+        
+    return results_dict
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -127,7 +160,7 @@ def upload_file():
         result = detector.analyze_video(filepath)
         logging.info(f"Analysis complete for {filename}")
         
-        # Store in database
+        # Store in database with enhanced metrics
         analysis = Analysis(
             filename=filename,
             original_filename=original_filename,
@@ -140,6 +173,26 @@ def upload_file():
             processing_time=float(result['processing_time']),
             analyzed_frames=int(result['analyzed_frames'])
         )
+        
+        # Add enhanced metrics if available
+        if 'total_frames' in result:
+            analysis.total_frames = int(result['total_frames'])
+        if 'fps' in result:
+            analysis.fps = float(result['fps'])
+        if 'resolution' in result and result['resolution']:
+            # Parse resolution string (e.g., "1280x720")
+            try:
+                width, height = result['resolution'].split('x')
+                analysis.resolution_width = int(width)
+                analysis.resolution_height = int(height)
+            except (ValueError, AttributeError):
+                pass
+        if 'prediction_std' in result:
+            analysis.prediction_std = float(result['prediction_std'])
+        if 'scene_changes' in result:
+            analysis.scene_changes = int(result['scene_changes'])
+        if 'error' in result and result['error']:
+            analysis.error_message = str(result['error'])
         
         try:
             db.session.add(analysis)
@@ -193,20 +246,8 @@ def results():
             # Get the analysis from database with the provided ID
             analysis = Analysis.query.get(analysis_id)
             if analysis:
-                # Convert to a dictionary format for the template
-                results_dict = {
-                    'filename': analysis.filename,
-                    'filepath': analysis.file_path,
-                    'real_probability': float(analysis.real_probability),
-                    'fake_probability': float(analysis.fake_probability),
-                    'is_fake': 'true' if analysis.is_fake else 'false',
-                    'confidence': float(analysis.confidence),
-                    'processing_time': float(analysis.processing_time),
-                    'analyzed_frames': int(analysis.analyzed_frames),
-                    'original_filename': analysis.original_filename,
-                    'file_size': analysis.file_size,
-                    'created_at': analysis.created_at
-                }
+                # Convert analysis to dictionary using the helper function
+                results_dict = analysis_to_dict(analysis)
                 return render_template('results.html', results=results_dict, from_db=True)
         except Exception as e:
             logging.error(f"Error retrieving analysis from database: {str(e)}")
@@ -220,20 +261,8 @@ def results():
         try:
             analysis = Analysis.query.get(session_analysis_id)
             if analysis:
-                # Convert to a dictionary format for the template
-                results_dict = {
-                    'filename': analysis.filename,
-                    'filepath': analysis.file_path,
-                    'real_probability': float(analysis.real_probability),
-                    'fake_probability': float(analysis.fake_probability),
-                    'is_fake': 'true' if analysis.is_fake else 'false',
-                    'confidence': float(analysis.confidence),
-                    'processing_time': float(analysis.processing_time),
-                    'analyzed_frames': int(analysis.analyzed_frames),
-                    'original_filename': analysis.original_filename,
-                    'file_size': analysis.file_size,
-                    'created_at': analysis.created_at
-                }
+                # Convert analysis to dictionary using the helper function
+                results_dict = analysis_to_dict(analysis)
                 return render_template('results.html', results=results_dict, from_db=True)
         except Exception as e:
             logging.error(f"Error retrieving analysis from database: {str(e)}")
